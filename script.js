@@ -281,15 +281,50 @@ async function tambahMurid() {
   }
 }
 
-function muatSemuaMuridKelas() {
-  const kelas = document.getElementById("kelas").value;
-  const ujian = document.getElementById("ujian").value.trim() || "UPSA";
-  const senarai = SENARAI_MURID[kelas] || [];
+async function muatSemuaMuridKelas() {
+
+  const kelas =
+  document.getElementById("kelas").value;
+
+  const ujian =
+  document.getElementById("ujian").value || "UPSA";
+
+  const senarai =
+  SENARAI_MURID[kelas] || [];
 
   if (senarai.length === 0) {
-    alert("Tiada senarai murid untuk kelas ini.");
+    alert("Tiada murid.");
     return;
   }
+
+  for (const nama of senarai) {
+
+    const item = {
+      kelas: kelas,
+      nama: nama,
+      ujian: ujian,
+      markah: 0,
+      gred: "E",
+      tp: 1,
+      status: "Belum Menguasai"
+    };
+
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify(item)
+    });
+
+  }
+
+  alert("Semua murid berjaya dimasukkan.");
+
+  location.reload();
+
+}
 
   let tambah = 0;
 
