@@ -505,17 +505,24 @@ function simpanKeGoogleSheet() {
   alert("Data disimpan terus apabila klik Tambah Markah.");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+window.onload = function () {
+
   isiSenaraiNama();
+
   loadDataDariGoogleSheet();
 
-  const kelasInput = document.getElementById("kelas");
+  const kelasInput =
+  document.getElementById("kelas");
+
   if (kelasInput) {
-    kelasInput.addEventListener("change", isiSenaraiNama);
+    kelasInput.onchange = isiSenaraiNama;
   }
 
-  const filterInput = document.getElementById("filterKelas");
+  const filterInput =
+  document.getElementById("filterKelas");
+
   if (filterInput) {
-    filterInput.addEventListener("change", paparData);
+    filterInput.onchange = paparData;
   }
-});
+
+};
