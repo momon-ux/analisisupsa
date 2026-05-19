@@ -345,11 +345,19 @@ function paparData() {
         <td>${item.kelas}</td>
         <td>${item.nama}</td>
         <td>${item.ujian}</td>
-        <td>${item.markah}</td>
+        <td>
+          <input type="number" min="0" max="100"
+            value="${item.markah}"
+            onchange="ubahMarkah(${index}, this.value)"
+            style="width:80px;padding:8px;text-align:center;">
+        </td>
         <td><strong>${item.gred}</strong></td>
         <td>TP${item.tp}</td>
         <td>${item.status}</td>
-        <td class="no-print"><button onclick="padamRekod(${index})">Padam</button></td>
+        <td class="no-print">
+          <button onclick="simpanRekod(${index})">Simpan</button>
+          <button onclick="padamRekod(${index})">Padam</button>
+        </td>
       </tr>
     `).join("");
   }
@@ -359,9 +367,24 @@ function paparData() {
   paparGrafTP();
 }
 
-function padamRekod(index) {
-  dataMarkah.splice(index, 1);
+function ubahMarkah(index, nilai) {
+  const data = getFilteredData();
+  const item = data[index];
+
+  item.markah = Number(nilai);
+  item.gred = kiraGred(item.markah);
+  item.tp = kiraTP(item.markah);
+  item.status = kiraStatus(item.markah);
+
   paparData();
+}
+
+async function simpanRekod(index) {
+  const data = getFilteredData();
+  const item = data[index];
+
+  await hantarKeGoogleSheet(item);
+  alert("Markah berjaya disimpan.");
 }
 
 function purata(data) {
