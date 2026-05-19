@@ -36,6 +36,7 @@ const SENARAI_MURID = {
     "RAZIEQ AZFAR BIN RUSLAN",
     "RISOAH ADRIANA BINTI RAIS"
   ],
+
   "6 Jayyid": [
     "AIRIS NUR RAYSHA AMANDA BINTI RIDUAN",
     "ARIZ FAIQH BIN MOHD ROZADY",
@@ -71,6 +72,7 @@ const SENARAI_MURID = {
     "SITI NURFARZIREKIN BINTI HERY",
     "YASIN MUHAMMAD KHAIRUL BIN YUSRAN"
   ],
+
   "6 Mumtaz": [
     "AFIFAH AUNI AQILAH BINTI JAMIDI",
     "AHMAD IZZAT BIN SUHARDI",
@@ -107,6 +109,7 @@ const SENARAI_MURID = {
     "SHAZWI SHAZIA BINTI AZMAN",
     "SUMAYYAH QAISARA BINTI ALFIAN"
   ],
+
   "6 Khoir": [
     "AADHAM MUHRIZ BIN MUHAMAD HARIS",
     "AHMAD RIFQI BIN TOTONG",
@@ -203,27 +206,29 @@ async function loadDataDariGoogleSheet() {
     const response = await fetch(GOOGLE_SCRIPT_URL);
     const rows = await response.json();
 
-    const dataRows = rows.slice(1).filter(row => row[1] && row[2]);
+    let dataRows = [];
 
-    dataMarkah = dataRows.map(row => {
-      const markah = Number(row[4]) || 0;
-      return {
-        kelas: row[1],
-        nama: row[2],
-        ujian: row[3] || "UPSA",
-        markah: markah,
-        gred: row[5] || kiraGred(markah),
-        tp: Number(row[6]) || kiraTP(markah),
-        status: row[7] || kiraStatus(markah)
-      };
-    });
+    if (Array.isArray(rows)) {
+      dataRows = rows.slice(1).filter(row => row[1] && row[2]);
+      dataMarkah = dataRows.map(row => {
+        const markah = Number(row[4]) || 0;
+        return {
+          kelas: row[1],
+          nama: row[2],
+          ujian: row[3] || "UPSA",
+          markah,
+          gred: row[5] || kiraGred(markah),
+          tp: Number(row[6]) || kiraTP(markah),
+          status: row[7] || kiraStatus(markah)
+        };
+      });
+    }
 
     dataMarkah = bersihkanDuplicate(dataMarkah);
     paparData();
 
   } catch (err) {
     console.error(err);
-    alert("Gagal baca Google Sheet. Pastikan Apps Script sudah deploy sebagai Web App.");
     paparData();
   }
 }
@@ -277,58 +282,23 @@ async function tambahMurid() {
     alert("Markah berjaya disimpan ke Google Sheet.");
   } catch (err) {
     console.error(err);
-    alert("Markah dipaparkan di website, tetapi gagal dihantar ke Google Sheet.");
+    alert("Markah dipaparkan, tetapi gagal dihantar ke Google Sheet.");
   }
 }
 
 async function muatSemuaMuridKelas() {
-
-  const kelas =
-  document.getElementById("kelas").value;
-
-  const ujian =
-  document.getElementById("ujian").value || "UPSA";
-
-  const senarai =
-  SENARAI_MURID[kelas] || [];
+  const kelas = document.getElementById("kelas").value;
+  const ujian = document.getElementById("ujian").value.trim() || "UPSA";
+  const senarai = SENARAI_MURID[kelas] || [];
 
   if (senarai.length === 0) {
-    alert("Tiada murid.");
+    alert("Tiada senarai murid untuk kelas ini.");
     return;
   }
 
-  for (const nama of senarai) {
-
-    const item = {
-      kelas: kelas,
-      nama: nama,
-      ujian: ujian,
-      markah: 0,
-      gred: "E",
-      tp: 1,
-      status: "Belum Menguasai"
-    };
-
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: JSON.stringify(item)
-    });
-
-  }
-
-  alert("Semua murid berjaya dimasukkan.");
-
-  location.reload();
-
-}
-
   let tambah = 0;
 
-  senarai.forEach(nama => {
+  for (const nama of senarai) {
     const item = {
       kelas,
       nama,
@@ -344,13 +314,14 @@ async function muatSemuaMuridKelas() {
     if (!wujud) {
       dataMarkah.push(item);
       tambah++;
+      await hantarKeGoogleSheet(item);
     }
-  });
+  }
 
   dataMarkah = bersihkanDuplicate(dataMarkah);
   paparData();
 
-  alert(tambah + " murid dimuatkan. Isi markah satu-satu dan klik Tambah Markah untuk simpan.");
+  alert(tambah + " murid berjaya dimasukkan ke Google Sheet.");
 }
 
 function getFilteredData() {
@@ -378,6 +349,7 @@ function paparData() {
         <td><strong>${item.gred}</strong></td>
         <td>TP${item.tp}</td>
         <td>${item.status}</td>
+        <td class="no-print"><button onclick="padamRekod(${index})">Padam</button></td>
       </tr>
     `).join("");
   }
@@ -385,6 +357,11 @@ function paparData() {
   paparAnalisisKeseluruhan();
   paparAnalisisKelas();
   paparGrafTP();
+}
+
+function padamRekod(index) {
+  dataMarkah.splice(index, 1);
+  paparData();
 }
 
 function purata(data) {
@@ -498,31 +475,20 @@ function padamSemua() {
 }
 
 function simpanData() {
-  alert("Data disimpan terus apabila klik Tambah Markah.");
-}
-
-function simpanKeGoogleSheet() {
-  alert("Data disimpan terus apabila klik Tambah Markah.");
+  alert("Data disimpan terus apabila klik Tambah Markah atau Muat Semua Murid Kelas.");
 }
 
 window.onload = function () {
-
   isiSenaraiNama();
-
   loadDataDariGoogleSheet();
 
-  const kelasInput =
-  document.getElementById("kelas");
-
+  const kelasInput = document.getElementById("kelas");
   if (kelasInput) {
     kelasInput.onchange = isiSenaraiNama;
   }
 
-  const filterInput =
-  document.getElementById("filterKelas");
-
+  const filterInput = document.getElementById("filterKelas");
   if (filterInput) {
     filterInput.onchange = paparData;
   }
-
 };
