@@ -197,7 +197,7 @@ function tambahMurid() {
     status: kiraStatus(markah)
   });
 
-  simpanData(false);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataMarkah));
   document.getElementById('markah').value = '';
   document.getElementById('nama').focus();
   paparData();
@@ -498,7 +498,7 @@ function muatSemuaMuridKelas() {
     }
   });
 
-  simpanData(false);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataMarkah));
   paparData();
 
   if (tambah === 0) {
