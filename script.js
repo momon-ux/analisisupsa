@@ -1,21 +1,122 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxt8qWmwjHmwsLUQ3TKSqMzLq2rG5_EKw5wcVLBfh4Ihh7Ku7kwQ0jB1ug8IvtnBJo7NQ/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxt8qWmwjHmwsLUQ3TKSqMzLq2rG5_EKw5wcVLBfh4Ihh7Ku7kwQ0jB1ug8IvtnBJo7NQ/exec";
 
-let records = [];
+const SENARAI_MURID = {
 
-// LOAD DATA DARI GOOGLE SHEET
+"5 Mumtaz": [
+"AB MUHAMMAD NURASYRAF BIN AB AZIS",
+"ABDULLAH BIN SAINI",
+"AFIFAH FITRIYAH BINTI ABRAHAM",
+"DAVINA ZAVIERA BINTI RIZAN HARDINATA",
+"DAYANG IZZ RYNA BINTI AHMAD",
+"DAYANG NUR SHAFIYYAH BINTI NASIP",
+"ERISHA DAMIA BINTI NASRI",
+"HAMISYA AMANI BINTI HAMSAH",
+"LINA AFIQAH BINTI ABDULLAH",
+"MOHAMAD DZAQERUL HAMZAH BIN MOHAMAD RIDWAN",
+"MOHAMMAD HARITH MIKAL BIN ISMAIL",
+"MOHAMMAD SHAQIRIN SARIPUDDIN",
+"MOHAMMAD THAQIF HARRAZ BIN SABRI",
+"MUHAMAD IZZAT BIN MUHAMAD SUFRI",
+"MUHAMMAD ARSYAD MALIQRIN SAHRUL",
+"MUHAMMAD ARSYAD MIQAEL BIN SAHRUL",
+"MUHAMMAD FAIZ DAM BIN SYAMSUDDIN",
+"MUHAMMAD HADIFF BIN SAMBRAN",
+"MUHAMMAD KAMARUL BIN KAMAL",
+"MUHAMMAD NAUFAL LUTHFI BIN MOHD SYAZWAN",
+"MUHAMMAD SYAFIQ AIMAN BIN AHMAD",
+"MUHAMMAD SYAHFIQ BIN JUPRI",
+"MUHAMMAD SYAHRIZAN UQASYA BIN REDUWAN",
+"MUHAMMAD ZAHIR ARRAYYAN BIN AZMAN",
+"NUR AISYAH ZULAIKHA BINTI MOHD ROSMAN",
+"NUR DAMIA QAISARA BINTI RAMLAN",
+"NUR FITRI SYAFIYAH BINTI ADZHAR KHAN",
+"NUR ZARA ZULAIQAH BINTI ABDULLAH",
+"NUR QISYA ADELIA BINTI HUSSIEN",
+"NURUL SHAFIQAH SENROSE BINTI ASBIDUN",
+"RAYYAN BIN SUHAIMI",
+"RAZIEQ AZFAR BIN RUSLAN",
+"RISOAH ADRIANA BINTI RAIS"
+],
+
+"6 Jayyid": [
+"AIRIS NUR RAYSHA AMANDA BINTI RIDUAN",
+"ARIZ FAIQH BIN MOHD ROZADY",
+"AUFA HANIFAH BINTI JUARI",
+"IZZAT NAZHAN BIN SUMARDI",
+"LINDA QAISARAH BINTI RAILAN",
+"MAHIRAH ATHILAH BINTI M SABRAN",
+"MUHAMMAD AFIF ARSYAD BIN HASRIN",
+"MUHAMMAD AIMAN BIN AMBO MASSE",
+"MUHAMMAD AMMAR SYAWAL BIN SUDEYANSHAH",
+"MUHAMMAD ARIQ ADAM BIN SANUDIN",
+"MUHAMMAD DANISH ZAFWAN BIN PAISAL",
+"MUHAMMAD DZAR DZIKRI BIN MARINDO @ ABD KARIM",
+"MUHAMMAD FAIZ IZZUDDIN BIN MOHD FAIROS",
+"MUHAMMAD FARIZ IZZUDDIN BIN MOHD FAIROS",
+"MUHAMMAD HAZIQ SYAKIR BIN AMING",
+"MUHAMMAD LUTHFI WAFI BIN ABDULLAH",
+"MUHAMMAD MAHDY BIN MAZLAN",
+"MUHAMMAD YUZWAN WAFIY BIN YUSUF",
+"NUR ADILAH BINTI ABDUL MALIK",
+"NUR ERYNANAURAH BINTI JAMAL",
+"NUR FARAH FADILAH BINTI MOHD ARDY",
+"NUR HUMAYRAA DELISYAH BINTI HERMAN",
+"NUR GHAYRIN AFIQAH BINTI JAMIDI",
+"NUR SUBAYYA AZZAHRA BINTI SAHIRUL",
+"NUR ZHAFIRAH BINTI ABDUL RASHID",
+"NURANIS FATIHAH BINTI JAMAL",
+"NURUL SUHADA BINTI SURYAMAN",
+"NURZAHRA ZAFIRAH BINTI ASIS",
+"RIZQ IRFAN BIN MOHD AZRUL",
+"SITI NUR ADIBAH SYAHIRAH BINTI AMRANI",
+"SITI NUR ALYANABILAH BINTI HASRIN",
+"SITI NURFARZIREKIN BINTI HERY",
+"YASIN MUHAMMAD KHAIRUL BIN YUSRAN"
+]
+
+};
+
+let dataMarkah = [];
+
+function isiSenaraiNama() {
+
+const kelas =
+document.getElementById("kelas").value;
+
+const namaSelect =
+document.getElementById("nama");
+
+namaSelect.innerHTML = "";
+
+SENARAI_MURID[kelas].forEach(nama => {
+
+const option =
+document.createElement("option");
+
+option.value = nama;
+option.textContent = nama;
+
+namaSelect.appendChild(option);
+
+});
+
+}
+
 async function loadData() {
 
 try {
 
-const response = await fetch(WEB_APP_URL);
-const data = await response.json();
+const response =
+await fetch(GOOGLE_SCRIPT_URL);
 
-records = [];
+const data =
+await response.json();
+
+dataMarkah = [];
 
 for (let i = 1; i < data.length; i++) {
 
-records.push({
-tarikh: data[i][0],
+dataMarkah.push({
 kelas: data[i][1],
 nama: data[i][2],
 ujian: data[i][3],
@@ -27,8 +128,7 @@ status: data[i][7]
 
 }
 
-renderTable();
-renderAnalysis();
+paparData();
 
 } catch (err) {
 
@@ -38,117 +138,26 @@ console.log(err);
 
 }
 
-// ANALISIS
-function renderAnalysis() {
-
-const kelasList = [...new Set(records.map(x => x.kelas))];
-
-const container = document.getElementById("analisisKelas");
-
-container.innerHTML = "";
-
-kelasList.forEach(kelas => {
-
-const murid = records.filter(x => x.kelas === kelas);
-
-const jumlah = murid.length;
-
-const totalMarkah =
-murid.reduce((a, b) => a + Number(b.markah), 0);
-
-const purata =
-jumlah > 0 ? (totalMarkah / jumlah).toFixed(2) : 0;
-
-const menguasai =
-murid.filter(x => Number(x.markah) >= 40).length;
-
-const belum =
-jumlah - menguasai;
-
-const peratus =
-jumlah > 0
-? ((menguasai / jumlah) * 100).toFixed(1)
-: 0;
-
-container.innerHTML += `
-
-<div class="kelas-card">
-
-<h2>${kelas}</h2>
-
-<div class="grid">
-
-<div class="box">
-<h1>${jumlah}</h1>
-<p>Jumlah Murid</p>
-</div>
-
-<div class="box">
-<h1>${purata}</h1>
-<p>Purata</p>
-</div>
-
-<div class="box">
-<h1>${menguasai}</h1>
-<p>Menguasai</p>
-</div>
-
-<div class="box">
-<h1>${belum}</h1>
-<p>Belum Menguasai</p>
-</div>
-
-<div class="box">
-<h1>${peratus}%</h1>
-<p>Peratus Menguasai</p>
-</div>
-
-</div>
-</div>
-
-`;
-
-});
-
-}
-
-// TABLE
-function renderTable() {
+function paparData() {
 
 const tbody =
-document.getElementById("tableBody");
+document.getElementById("jadualMarkah");
 
 tbody.innerHTML = "";
 
-records.forEach((item, index) => {
+dataMarkah.forEach((item, index) => {
 
 tbody.innerHTML += `
 
 <tr>
-
 <td>${index + 1}</td>
 <td>${item.kelas}</td>
 <td>${item.nama}</td>
 <td>${item.ujian}</td>
-
-<td>
-<input
-type="number"
-value="${item.markah}"
-readonly
-/>
-</td>
-
+<td>${item.markah}</td>
 <td>${item.gred}</td>
-
-<td>
-<span class="tp">
-${item.tp}
-</span>
-</td>
-
+<td>${item.tp}</td>
 <td>${item.status}</td>
-
 </tr>
 
 `;
@@ -157,5 +166,12 @@ ${item.tp}
 
 }
 
-// START
+document.addEventListener(
+"DOMContentLoaded",
+function () {
+
+isiSenaraiNama();
 loadData();
+
+}
+);
