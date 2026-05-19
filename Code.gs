@@ -10,16 +10,16 @@ function doPost(e) {
 
   sheet.clearContents();
 
-sheet.appendRow([
-  new Date(),
-  item.kelas,
-  item.nama,
-  item.ujian,
-  Number(item.markah),
-  item.gred,
-  item.tp,
-  item.status
-]);
+  sheet.appendRow([
+    "Tarikh",
+    "Kelas",
+    "Nama Murid",
+    "Ujian",
+    "Markah",
+    "Gred",
+    "TP",
+    "Status"
+  ]);
 
   data.records.forEach(item => {
 
