@@ -1,6 +1,6 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxt8qWmwjHmwsLUQ3TKSqMzLq2rG5_EKw5wcVLBfh4Ihh7Ku7kwQ0jB1ug8IvtnBJo7NQ/exec";
 
-let records = []; 
+let records = [];
 
 // LOAD DATA DARI GOOGLE SHEET
 async function loadData() {
