@@ -1,14 +1,29 @@
+const SPREADSHEET_ID = "13zytP1m0j286G0yRDQw5W6fbqu7g4RkE0meI";
 const SHEET_NAME = "Sheet1";
 
 function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
   const data = JSON.parse(e.postData.contents);
 
-  if (data.action === "saveAll") {
-    sheet.clearContents();
-    sheet.appendRow(["Tarikh", "Kelas", "Nama Murid", "Ujian", "Markah", "Gred", "TP", "Status"]);
+  sheet.clearContents();
 
-    const rows = (data.records || []).map(item => [
+  sheet.appendRow([
+    "Tarikh",
+    "Kelas",
+    "Nama Murid",
+    "Ujian",
+    "Markah",
+    "Gred",
+    "TP",
+    "Status"
+  ]);
+
+  data.records.forEach(item => {
+
+    sheet.appendRow([
       new Date(),
       item.kelas,
       item.nama,
@@ -19,28 +34,23 @@ function doPost(e) {
       item.status
     ]);
 
-    if (rows.length > 0) {
-      sheet.getRange(2, 1, rows.length, 8).setValues(rows);
-    }
-  }
+  });
 
   return ContentService
-    .createTextOutput(JSON.stringify({ result: "success" }))
+    .createTextOutput(JSON.stringify({
+      result: "success"
+    }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  const data = sheet.getDataRange().getValues();
-  const json = JSON.stringify(data);
+function doGet() {
 
-  if (e && e.parameter && e.parameter.callback) {
-    return ContentService
-      .createTextOutput(e.parameter.callback + "(" + json + ");")
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
+  const data = sheet.getDataRange().getValues();
 
   return ContentService
-    .createTextOutput(json)
+    .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
 }
