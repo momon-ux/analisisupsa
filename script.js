@@ -270,7 +270,7 @@ function loadDataDariGoogleSheet() {
   };
 
   const script = document.createElement('script');
-  script.src = GOOGLE_SCRIPT_URL + '?callback=' + callbackName + '&t=' + Date.now();
+  script.src = GOOGLE_SCRIPT_URL + "?action=read&callback=" + callbackName + "&t=" + Date.now();
   script.onerror = function() {
     sedangLoadSheet = false;
     paparData();
