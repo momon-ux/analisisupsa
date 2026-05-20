@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analisis Markah Matematik 2026</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Analisis Markah Ujian Peperiksaan Matematik</h1>
+    <p>Sesi Akademik 2026</p>
+    <p>Disediakan oleh: <strong>Mohammad Fikrey bin Abdul Gapar</strong></p>
+    <p>Guru Mata Pelajaran Matematik</p>
+  </header>
+
+  <main class="container">
+    <section class="card input-card">
+      <h2>Pengisian Markah Murid</h2>
+      <div class="grid">
+        <div><label for="kelas">Kelas</label><select id="kelas">
+          <option value="5 Mumtaz">5 Mumtaz</option><option value="6 Jayyid">6 Jayyid</option>
+          <option value="6 Mumtaz">6 Mumtaz</option><option value="6 Khoir">6 Khoir</option>
+        </select></div>
+        <div><label for="nama">Nama Murid</label><select id="nama"><option value="">-- Pilih nama murid --</option></select></div>
+        <div><label for="markah">Markah /100</label><input id="markah" type="number" min="0" max="100" placeholder="0 - 100" /></div>
+        <div><label for="ujian">Jenis Ujian</label><input id="ujian" type="text" value="UPSA" /></div>
+      </div>
+      <div class="actions no-print">
+        <button class="btn-primary" onclick="tambahMurid()">Tambah / Simpan Markah</button>
+        <button class="btn-secondary" onclick="muatSemuaMuridKelas()">Muat Semua Murid Kelas</button>
+        <button class="btn-success" onclick="simpanSemuaKeGoogleSheet()">Simpan Semua ke Google Sheet</button>
+        <button class="btn-warning" onclick="exportCSV()">Export CSV</button>
+        <button class="btn-dark" onclick="window.print()">Cetak / PDF</button>
+        <button class="btn-danger" onclick="padamPaparanSahaja()">Kosongkan Paparan</button>
+      </div>
+      <p class="note" id="statusInfo">Data disimpan ke Google Sheet. Semua peranti akan baca data yang sama selepas refresh.</p>
+    </section>
+
+    <section class="card">
+      <h2>Senarai Markah Murid</h2>
+      <div class="grid no-print filter-area">
+        <div><label for="filterKelas">Paparan Kelas</label><select id="filterKelas">
+          <option value="Semua">Semua Kelas</option><option value="5 Mumtaz">5 Mumtaz</option>
+          <option value="6 Jayyid">6 Jayyid</option><option value="6 Mumtaz">6 Mumtaz</option>
+          <option value="6 Khoir">6 Khoir</option>
+        </select></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr>
+        <th>Bil</th><th>Kelas</th><th>Nama Murid</th><th>Ujian</th><th>Markah</th><th>Gred</th><th>TP</th><th>Status</th><th class="no-print">Tindakan</th>
+      </tr></thead><tbody id="jadualMarkah"></tbody></table></div>
+    </section>
+
+    <section class="card"><h2>Analisis Keseluruhan</h2><div id="analisisKeseluruhan" class="summary-grid"></div></section>
+    <section class="card"><h2>Analisis Mengikut Kelas</h2><div id="analisisKelas"></div></section>
+    <section class="card"><h2>Taburan Tahap Penguasaan</h2><div id="grafTP"></div></section>
+  </main>
+
+  <footer>Sistem Analisis Markah Matematik Tahun 2026</footer>
+  <script src="script.js"></script>
+</body>
+</html>
